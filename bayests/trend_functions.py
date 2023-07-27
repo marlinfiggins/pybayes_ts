@@ -28,8 +28,8 @@ class ConstantTrend(TimeSeriesNode):
             + "or change points `s` directly."
         )
 
-        self.k = k  # Number of change points
         self.s = s  # Location of change points # If None, we can update later
+        self.k = k if s is None else len(s)  # Number of change points
         self.name = name or f"ConstantTrend(k={k})"
         self.intercept = intercept
 
