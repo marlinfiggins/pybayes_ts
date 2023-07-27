@@ -8,7 +8,8 @@ class FourierSeasonality(TimeSeriesNode):
     def __init__(self, k, period, name=None):
         self.k = k
         self.period = period
-        self.name = name or f"ConstantTrend(k={k})"
+        self.name = name or f"FourierSeasonality(k={k})"
+        self.n_params = 2 * k
 
     @staticmethod
     def _design(k, period, t):
@@ -20,7 +21,7 @@ class FourierSeasonality(TimeSeriesNode):
         return self.features
 
     def _model(self, t):
-        with numpyro.plate(self.name + f"_plate_{self.k}", 2 * self.k):
+        with numpyro.plate(self.name + f"_plate_{self.k}", self.n_params):
             beta = numpyro.sample(self.name + "_beta", dist.Normal(0.0, 1.0))
         self.design(t)
         self.output = jnp.dot(self.features, beta)
