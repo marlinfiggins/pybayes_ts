@@ -1,10 +1,10 @@
 import jax.numpy as jnp
 import numpyro
 import numpyro.distributions as dist
-from bayests.TimeSeriesTree import TimeSeriesNode
+from bayests.TimeSeriesTree import TrendNode
 
 
-class FlatTrend(TimeSeriesNode):
+class FlatTrend(TrendNode):
     def __init__(self, name=None):
         self.name = name or "FlatTrend()"
 
@@ -21,7 +21,7 @@ class FlatTrend(TimeSeriesNode):
         self.output = self.features * beta
 
 
-class ConstantTrend(TimeSeriesNode):
+class ConstantTrend(TrendNode):
     def __init__(self, k, s=None, name=None, intercept=True):
         assert k is not None or s is not None, (
             "Constant trend must have either given a num of change points `k`"
@@ -52,7 +52,7 @@ class ConstantTrend(TimeSeriesNode):
         self.output = jnp.dot(self.features, beta)
 
 
-class LinearTrend(TimeSeriesNode):
+class LinearTrend(TrendNode):
     def __init__(
         self,
         k=None,
@@ -69,6 +69,7 @@ class LinearTrend(TimeSeriesNode):
         self.k = k if s is None else len(s)  # Number of change points
         self.name = name or f"LinearTrend(k={k})"
         self.intercept = intercept
+        self.n_params = self.k + int(self.intercept)
 
     @staticmethod
     def _design(s, t, intercept):
@@ -84,7 +85,6 @@ class LinearTrend(TimeSeriesNode):
         return self.features
 
     def _model(self, t):
-        self.n_params = self.k + int(self.intercept)
         with numpyro.plate(self.name + f"_plate_{self.k}", self.n_params):
             beta = numpyro.sample(self.name + "_beta", dist.Normal(0.0, 1.0))
         self.design(t)

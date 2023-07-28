@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from bayests.LikelihoodTransform import Normal
 from bayests.fitting_models import run_svi, svi_predict
+from bayests.utils import ComponentType
 
 import numpyro
 
@@ -13,6 +14,7 @@ class TimeSeriesNode(ABC):
         self._components = []
         self.features = None
         self.output = None
+        self.component_type = ComponentType.OTHER
 
     @abstractmethod
     def _model(self, X):
@@ -43,6 +45,10 @@ class TimeSeriesNode(ABC):
         return params, map_estimates
 
     def _eval(self):
+        """
+        Return output variable given parameters and features.
+        This will return None if model has not sampled parameters yet.
+        """
         return self.output
 
     def _unravel(self):
@@ -58,11 +64,28 @@ class TimeSeriesNode(ABC):
     def n_components(self):
         return len(self.components)
 
-    """ def get_features(self): """
-    """     return [comp.features for comp in self.components] """
+
+class TrendNode(TimeSeriesNode):
+    def __init__(self):
+        self.component_type = ComponentType.TREND
 
 
-class AdditiveTSNode(TimeSeriesNode):
+class SeasonalityNode(TimeSeriesNode):
+    def __init__(self):
+        self.component_type = ComponentType.SEASONALITY
+
+
+class RegressorNode(TimeSeriesNode):
+    def __init__(self):
+        self.component_type = ComponentType.REGRESSOR
+
+
+class CompositeNode(TimeSeriesNode):
+    def __init__(self):
+        self.component_type = ComponentType.COMPOSITE
+
+
+class AdditiveTSNode(CompositeNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
@@ -78,7 +101,7 @@ class AdditiveTSNode(TimeSeriesNode):
         pass
 
 
-class MultiplicativeTSNode(TimeSeriesNode):
+class MultiplicativeTSNode(CompositeNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right

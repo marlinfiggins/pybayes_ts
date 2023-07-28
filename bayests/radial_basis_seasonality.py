@@ -1,10 +1,10 @@
 import jax.numpy as jnp
-from bayests.TimeSeriesTree import TimeSeriesNode
+from bayests.TimeSeriesTree import SeasonalityNode
 import numpyro
 import numpyro.distributions as dist
 
 
-class RadialBasisSeasonality(TimeSeriesNode):
+class RadialBasisSeasonality(SeasonalityNode):
     def __init__(self, k, s=None, name=None, period=365.25, alpha=1):
         assert k is not None or s is not None, (
             "Linear trend must have either given a num of change points `k`"

@@ -1,10 +1,11 @@
 import jax.numpy as jnp
-from bayests.TimeSeriesTree import TimeSeriesNode
+from bayests.TimeSeriesTree import SeasonalityNode
+from bayests.utils import ComponentType
 import numpyro
 import numpyro.distributions as dist
 
 
-class FourierSeasonality(TimeSeriesNode):
+class FourierSeasonality(SeasonalityNode):
     def __init__(self, k, period, name=None):
         self.k = k
         self.period = period
