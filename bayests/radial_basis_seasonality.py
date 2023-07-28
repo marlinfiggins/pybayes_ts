@@ -1,5 +1,5 @@
 import jax.numpy as jnp
-from bayests.TimeSeriesTree import SeasonalityNode
+from bayests.time_series_tree import SeasonalityNode
 import numpyro
 import numpyro.distributions as dist
 

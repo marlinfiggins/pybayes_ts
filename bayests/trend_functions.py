@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 import numpyro
 import numpyro.distributions as dist
-from bayests.TimeSeriesTree import TrendNode
+from bayests.time_series_tree import TrendNode
 
 
 class FlatTrend(TrendNode):
