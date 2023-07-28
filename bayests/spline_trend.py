@@ -1,6 +1,6 @@
 from jax import vmap
 import jax.numpy as jnp
-from bayests.TimeSeriesTree import TimeSeriesNode
+from bayests.time_series_tree import TimeSeriesNode
 
 
 class Spline:

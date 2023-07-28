@@ -1,12 +1,10 @@
 from abc import ABC, abstractmethod
 
-from bayests.LikelihoodTransform import Normal
+from bayests.likelihood_transform import Normal
 from bayests.fitting_models import run_svi, svi_predict
 from bayests.utils import ComponentType
 
 import numpyro
-
-# What overhauls are necessary for easy specification of hierarhcail models and partial pooling and running on multiple time series
 
 
 class TimeSeriesNode(ABC):
@@ -26,7 +24,7 @@ class TimeSeriesNode(ABC):
     def __mul__(self, other):
         return MultiplicativeTSNode(self, other)
 
-    def model(self, t, y, likelihood=None):
+    def model(self, t, y=None, likelihood=None):
 
         # Loop over model components
         components = self._unravel()
@@ -115,15 +113,3 @@ class MultiplicativeTSNode(CompositeNode):
 
     def _model(self):
         pass
-
-
-# In some cases, this can reduce to a matrix mult
-# But I want to allow for more complicated models
-# Evaluating a time series model requires matching up parameters with model
-
-# Each model component will be evaluated with parameters
-# Each component can produce its own fixed input data?
-# We then tranverse the tree and compute the thingy
-
-# For multiple time series we can vmap and then do the pooling seperately
-# We'll have a model factory that takes in this tree and the data
