@@ -12,6 +12,7 @@ class TimeSeriesNode(ABC):
     def __init__(self):
         self._components = []
         self.features = None
+        self.output = None
 
     @abstractmethod
     def _model(self, X):
