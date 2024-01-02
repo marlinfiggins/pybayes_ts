@@ -1,21 +1,20 @@
 from jax.random import PRNGKey
-import jax.numpy as jnp
 import numpyro
 from numpyro.infer import SVI, Trace_ELBO, autoguide, Predictive
+from numpyro.infer import MCMC, NUTS
 
 
-# TODO: Allow user to specify learning rate .etc
-def run_svi(model, guide_family, max_iter, X, Y):
+def run_svi(model, guide_family, X, Y, max_iter, lr, key):
     if guide_family == "AutoDelta":
         guide = autoguide.AutoDelta(model)
     elif guide_family == "AutoDiagonalNormal":
         guide = autoguide.AutoDiagonalNormal(model)
     else:
-        guide = None
+        guide = autoguide.AutoMultivariateNormal(model)
 
-    optimizer = numpyro.optim.Adam(0.001)
+    optimizer = numpyro.optim.Adam(lr)
     svi = SVI(model, guide, optimizer, Trace_ELBO())
-    svi_results = svi.run(PRNGKey(1), max_iter, t=X, y=Y)
+    svi_results = svi.run(key, max_iter, t=X, y=Y)
     params = svi_results.params
     return params, guide
 
@@ -26,3 +25,9 @@ def svi_predict(model, guide, params, num_samples, t):
     )
     predictions = predictive(PRNGKey(1), t=t, y=None)
     return predictions
+
+
+def run_mcmc(model, X, Y, num_warmup, num_samples, key):
+    mcmc = MCMC(NUTS(model), num_warmup=num_warmup, num_samples=num_samples)
+    mcmc.run(key, X, Y)
+    return mcmc.get_samples()
